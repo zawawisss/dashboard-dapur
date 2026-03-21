@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->onUpdate('set null')->onDelete('set null');
             $table->foreignId('category_id')->nullable()->constrained('categories')->onUpdate('set null')->onDelete('set null');
+            $table->string('name');
             $table->bigInteger('amount');
             $table->date('date');
             $table->string('note');

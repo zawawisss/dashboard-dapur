@@ -40,7 +40,13 @@ class TransactionSeeder extends Seeder
                 // Tanggal acak 2 bulan terakhir
                 $date = Carbon::createFromTimestamp(rand($startDate->timestamp, $endDate->timestamp));
 
+                // Nama transaksi acak
+                $inNames = ['Suntikan Dana', 'Modal Tambahan', 'Pendapatan Harian', 'Pemasukan Pasif'];
+                $outNames = ['Beli Piring', 'Beli Sapu', 'Bayar Listrik', 'Gaji Karyawan', 'Belanja Bahan Baku'];
+                $name = $isIncome ? $inNames[array_rand($inNames)] : $outNames[array_rand($outNames)];
+
                 Transaction::create([
+                    'name' => $name,
                     'user_id' => $user->id,
                     'category_id' => $category->id,
                     'amount' => $amount,
