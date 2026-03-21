@@ -2,12 +2,11 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Auth\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+use App\Filament\Admin\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -25,21 +24,33 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id('admin')
             ->path('admin')
-            ->login(Login::class)
+            ->login(\App\Filament\Auth\Login::class)
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::HEAD_END,
+                fn (): string => '<style>
+                    /* Meratakan Padding Horizontal Sidebar */
+                    .fi-sidebar-nav, .fi-sidebar-header {  padding-left: 1.75rem !important; padding-right: 1rem !important; }
+
+                    /* Light Mode (sama dengan warna Card putih) */
+                    .fi-sidebar { background-color: #ffffff !important; border-right: 1px solid #e2e8f0; } 
+                    
+                    /* Dark Mode (warna Card di Filament menggunakan transparansi putih 5%) */
+                    .dark .fi-sidebar { background-color: rgba(255, 255, 255, 0.05) !important; border-right: 1px solid rgba(255, 255, 255, 0.1); } 
+                </style>',
+            )
+            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
+            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
             ->widgets([
-                // AccountWidget::class,
                 // FilamentInfoWidget::class,
             ])
             ->middleware([

@@ -9,7 +9,10 @@ use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements FilamentUser
+use Filament\Models\Contracts\HasName;
+use Filament\Models\Contracts\HasAvatar;
+
+class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -20,10 +23,10 @@ class User extends Authenticatable implements FilamentUser
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'username',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -52,5 +55,26 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function financialReports()
+    {
+        return $this->hasMany(FinancialReport::class);
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->username;
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        // Return a simple base64 SVG avatar to bypass UI-Avatars API timeout
+        return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2NjYyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmaWxsPSIjMzMzIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjM1ZW0iPlU8L3RleHQ+PC9zdmc+';
     }
 }
