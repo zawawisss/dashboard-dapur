@@ -59,7 +59,44 @@ class ViewMonthlyReport extends Page implements HasTable
                     ->label('Catatan')
                     ->limit(30),
             ])
-            ->defaultSort('date', 'asc');
+            ->defaultSort('date', 'asc')
+            ->actions([
+                \Filament\Actions\EditAction::make()
+                    ->form([
+                        \Filament\Forms\Components\Select::make('user_id')
+                            ->relationship('user', 'username', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->whereNull('deleted_at'))
+                            ->label('Pilih Investor')
+                            ->visible(fn () => auth()->user() && auth()->user()->role === 'ADMIN')
+                            ->required(fn () => auth()->user() && auth()->user()->role === 'ADMIN'),
+                        \Filament\Forms\Components\Select::make('category_id')
+                            ->relationship('category', 'name')
+                            ->label('Kategori')
+                            ->searchable()
+                            ->preload()
+                            ->allowHtml()
+                            ->getOptionLabelFromRecordUsing(function (\App\Models\Category $record) {
+                                return view('filament.components.category-badge', ['record' => $record])->render();
+                            })
+                            ->required(),
+                        \Filament\Forms\Components\TextInput::make('name')
+                            ->label('Nama Transaksi (Msl: Beli Piring)')
+                            ->required(),
+                        \Filament\Forms\Components\TextInput::make('amount')
+                            ->label('Nominal')
+                            ->numeric()
+                            ->prefix('Rp')
+                            ->required(),
+                        \Filament\Forms\Components\DatePicker::make('date')
+                            ->label('Tanggal')
+                            ->required(),
+                        \Filament\Forms\Components\Textarea::make('note')
+                            ->label('Keterangan / Catatan')
+                            ->nullable(),
+                    ])
+                    ->visible(fn () => auth()->check() && auth()->user()->role === 'ADMIN'),
+                \Filament\Actions\DeleteAction::make()
+                    ->visible(fn () => auth()->check() && auth()->user()->role === 'ADMIN'),
+            ]);
     }
 
     protected function getHeaderWidgets(): array

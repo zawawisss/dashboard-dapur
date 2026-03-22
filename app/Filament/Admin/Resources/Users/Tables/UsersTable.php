@@ -35,15 +35,19 @@ class UsersTable
                     ->toggleable(isToggledHiddenByDefault: false),
             ])
             ->filters([
-                //
+                \Filament\Tables\Filters\TrashedFilter::make(),
             ])
             ->recordActions([
                 EditAction::make(),
                 \Filament\Actions\DeleteAction::make(),
+                \Filament\Actions\RestoreAction::make(),
+                \Filament\Actions\ForceDeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    \Filament\Actions\RestoreBulkAction::make(),
+                    \Filament\Actions\ForceDeleteBulkAction::make(),
                 ]),
             ]);
     }

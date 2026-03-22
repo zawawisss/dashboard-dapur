@@ -11,11 +11,12 @@ use Illuminate\Notifications\Notifiable;
 
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.

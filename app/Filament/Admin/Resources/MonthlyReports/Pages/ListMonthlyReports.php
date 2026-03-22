@@ -19,7 +19,7 @@ class ListMonthlyReports extends ListRecords
                 ->model(\App\Models\Transaction::class)
                 ->form([
                     \Filament\Forms\Components\Select::make('user_id')
-                        ->relationship('user', 'username')
+                        ->relationship('user', 'username', fn (\Illuminate\Database\Eloquent\Builder $query) => $query->whereNull('deleted_at'))
                         ->label('Pilih Investor')
                         ->visible(fn () => auth()->user()->role === 'ADMIN')
                         ->required(fn () => auth()->user()->role === 'ADMIN'),

@@ -6,6 +6,7 @@ use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use Filament\Notifications\Notification;
 use Illuminate\Validation\ValidationException;
 
 class Login extends BaseLogin
@@ -53,8 +54,17 @@ class Login extends BaseLogin
      */
     protected function throwFailureValidationException(): never
     {
+        Notification::make()
+            ->title('Peringatan Login!')
+            ->body('Username atau Password anda salah, Coba Lagi!')
+            ->danger()
+            ->icon('heroicon-o-x-circle')
+            ->persistent()
+            ->duration(5000)
+            ->send();
+
         throw ValidationException::withMessages([
-            'data.username' => __('filament-panels::auth/pages/login.messages.failed'),
+            // 'data.username' => 'Credentials mismatch',
         ]);
     }
 }

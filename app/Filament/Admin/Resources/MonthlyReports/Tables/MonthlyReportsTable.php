@@ -63,8 +63,6 @@ class MonthlyReportsTable
             ])
             ->recordActions([
                 \Filament\Actions\ViewAction::make(),
-                EditAction::make()
-                    ->visible(fn () => auth()->user()->role === 'ADMIN'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
