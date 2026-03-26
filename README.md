@@ -73,8 +73,8 @@ Ikuti langkah-langkah berikut untuk menjalankan project di lokal:
 
 ### 🔑 Akun Default (Seeder)
 
-- **Admin**: `admin@admin.com` / `password`
-- **User**: `asifyan@gmail.com` / `password`
+- **Admin**: `admin` / `admin@admin.com` / `password`
+- **User**: `shifyannn` / `asifyan@gmail.com` / `password`
 
 ## 📁 Struktur Proyek (Filament v5 Pattern)
 
