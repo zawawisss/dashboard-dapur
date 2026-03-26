@@ -1,62 +1,100 @@
 # 🍳 Dapurku Dashboard
 
-Sistem manajemen keuangan dan investor berbasis web yang dibangun dengan teknologi paling mutakhir.
+Sistem manajemen keuangan dan investor berbasis web yang dibangun dengan Laravel 12 dan Filament v5 untuk efisiensi operasional maksimal.
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Laravel 12](https://laravel.com)
-- **Admin Panel**: [Filament v5.x](https://filamentphp.com) (Bleeding Edge)
-- **Database**: MySQL / MariaDB
-- **UI Components**: Blade, Tailwind CSS, Heroicons
+- **Framework**: [Laravel ^12.0 (Dev)](https://laravel.com)
+- **Admin Panel**: [Filament v5.3.5](https://filamentphp.com)
+- **Programming Language**: PHP 8.2+
+- **Database**: MySQL / MariaDB (Mendukung SQLite)
+- **UI Components**: Blade, Livewire, Tailwind CSS, Heroicons
+- **Custom Middleware**: LogRequestPerformance (Query & Request Timing)
 
-## 📁 Struktur Proyek (Filament v5)
+## ✨ Fitur Utama
 
-Proyek ini mengikuti arsitektur modular Filament v5 untuk pemisahan logika yang bersih:
+- **Panel Admin Terintegrasi**: Manajemen data cepat menggunakan Filament v5.
+- **Manajemen Investor (User)**: Implementasi **Soft Deletes** untuk menjaga integritas data riwayat transaksi.
+- **Laporan Bulanan Dinamis**: Penarikan data laporan berbasis **SQL View** (`monthly_reports_view`) untuk performa tinggi.
+- **Autentikasi Kustom**: Login kustom dengan **Modal Notifikasi** interaktif untuk penanganan error.
+- **Pengaturan Profil**: Update data akun secara terpisah melalui **Modal Actions** (Username, Email, Password).
 
-### 1. Konfigurasi Panel (`app/Providers/Filament/`)
+## 🛠️ Persiapan Lingkungan (Prerequisites)
 
-- **`AdminPanelProvider.php`**: Pusat pengaturan navigasi, tema warna (`Amber`), brand name (`Dapurku`), dan registrasi otomatis resource.
+Pastikan Anda memiliki:
 
-### 2. Sumber Daya & Modul (`app/Filament/Admin/Resources/`)
+- PHP >= 8.2
+- Composer
+- Database (MySQL/SQLite)
 
-Setiap modul (User, Category, Laporan) diatur dalam folder kustom:
+## 🏁 Panduan Instalasi (Getting Started)
 
-- **`Schemas/`**: Tempat mendefinisikan struktur **Form** (Input data).
-- **`Tables/`**: Tempat mendefinisikan struktur **Table** (List data, Filter, Actions).
-- **`Pages/`**: Logika halaman khusus untuk resource tersebut.
+Ikuti langkah-langkah berikut untuk menjalankan project di lokal:
 
-### 3. Fitur Utama & Kustomisasi
+1. **Clone Repository**
 
-#### 🔐 Autentikasi (`app/Filament/Auth/Login.php`)
+    ```bash
+    git clone [url-repo-anda]
+    cd dashboard-dapur
+    ```
 
-- Menggunakan class `Login` kustom yang di-override untuk menampilkan **Modal Notifikasi** jika login gagal (Username/Password salah), lengkap dengan fitur _auto-close_.
+2. **Instal Dependensi PHP**
 
-#### 👥 Manajemen Investor (User)
+    ```bash
+    composer install
+    ```
 
-- Implementasi **Soft Deletes**: User yang dihapus tidak hilang dari database (hanya ditandai `deleted_at`), sehingga riwayat transaksi tetap aman.
-- Filter khusus untuk menampilkan data aktif atau data yang sudah dihapus.
+3. **Konfigurasi Environment**
 
-#### 📊 Laporan Keuangan (MonthlyReport)
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-- Data ditarik dari **SQL View** agar perhitungan performa keuangan tetap cepat dan dinamis.
-- Relasi `User` diperbarui menggunakan `withTrashed()` agar tetap menampilkan nama investor meskipun akunnya sudah dinonaktifkan.
+4. **Konfigurasi Database & .env**
+   Sesuaikan variabel berikut di file `.env`:
 
-#### ⚙️ Pengaturan Profil (`app/Filament/Admin/Pages/Setting.php`)
+    ```bash
+    APP_NAME="Dapurku Dashboard"
+    APP_ENV=local
+    APP_URL=http://localhost:8000
 
-- Halaman mandiri untuk mengubah data akun.
-- Menggunakan pola **Modal Actions**: Username, Email, dan Password diubah secara terpisah melalui pop-up modal untuk keamanan dan UI yang lebih bersih.
-- Tampilan kustom di: `resources/views/filament/admin/pages/setting.blade.php`.
+    # Database (Contoh menggunakan MySQL)
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=nama_db_anda
+    DB_USERNAME=root
+    DB_PASSWORD=
 
-## 🛠️ Panduan Pengembangan
+    # Logging (Channel 'performance' harus ada jika ingin monitoring)
+    LOG_CHANNEL=stack
+    LOG_STACK=single
+    ```
 
-| Tujuan                     | Lokasi Modifikasi                               |
-| :------------------------- | :---------------------------------------------- |
-| **Menambah Field Form**    | `app/Filament/Admin/Resources/[Nama]/Schemas/`  |
-| **Mengubah Kolom Tabel**   | `app/Filament/Admin/Resources/[Nama]/Tables/`   |
-| **Mengubah Ikon/Warna**    | `app/Providers/Filament/AdminPanelProvider.php` |
-| **Kustomisasi View Blade** | `resources/views/filament/`                     |
-| **Logika Database**        | `app/Models/`                                   |
+5. **Migrasi & Seed Database**
+
+    ```bash
+    php artisan migrate --seed
+    ```
+
+6. **Jalankan Aplikasi**
+    ```bash
+    php artisan serve
+    ```
+
+### 🔑 Akun Default (Seeder)
+
+- **Admin**: `admin@admin.com` / `password`
+- **User**: `asifyan@gmail.com` / `password`
+
+## 📁 Struktur Proyek (Filament v5 Pattern)
+
+Project ini mengikuti arsitektur modular Filament v5:
+
+- `app/Filament/Admin/Resources/`: Setiap resource memiliki folder sendiri dengan sub-folder `Schemas/` (Form) dan `Tables/` (Action/Filter).
+- `app/Providers/Filament/AdminPanelProvider.php`: Pusat konfigurasi navigasi, tema warna (`Amber`), dan brand ("Dapurku").
 
 ---
 
-_Dokumentasi ini dibuat secara dinamis untuk membantu pemeliharaan proyek Dapurku._
+_Dokumentasi ini dibuat untuk memudahkan proses onboarding dan pemeliharaan tim pengembang Dapurku. Project ini sepenuhnya berbasis PHP (tanpa build step NPM)._
