@@ -1,0 +1,73 @@
+name: Deploy to WebA
+
+on:
+  push:
+    branches:
+      - master # Jalankan otomatis saat push ke branch main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, xml, ctype, iconv, mysql, bcmath # Sesuaikan kebutuhan Laravel
+          tools: composer:v2
+
+      - name: Adjust paths for server
+        run: |
+          sed -i "s|'../storage/framework/maintenance.php'|'../laravel_core/storage/framework/maintenance.php'|g" public/index.php
+          sed -i "s|'../vendor/autoload.php'|'../laravel_core/vendor/autoload.php'|g" public/index.php
+          sed -i "s|'../bootstrap/app.php'|'../laravel_core/bootstrap/app.php'|g" public/index.php
+
+      - name: Install Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      # 1. Upload file ke folder laravel_core
+      - name: Sync Files to Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+          SOURCE: "/"
+          TARGET: "/home/${{ secrets.SSH_USER }}/domains/portalahda.cloud/laravel_core"
+          EXCLUDE: "/node_modules/, /storage/, /tests/, .env, .git/, .github/, /public/"
+
+      # 2. Upload file assets (Vite/Build) ke public_html
+      - name: Sync Public Assets to public_html
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+          SOURCE: "public/"
+          TARGET: "/home/${{ secrets.SSH_USER }}/domains/portalahda.cloud/public_html"
+
+      # 3. Jalankan perintah Artisan di server
+      - name: Run Remote Commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/${{ secrets.SSH_USER }}/domains/portalahda.cloud/laravel_core
+
+            /opt/alt/php84/usr/bin/php artisan down --refresh=15
+
+            [ ! -L ../public_html/storage ] && /opt/alt/php84/usr/bin/php artisan storage:link
+
+            /opt/alt/php84/usr/bin/php artisan migrate --force
+            /opt/alt/php84/usr/bin/php artisan optimize
+            /opt/alt/php84/usr/bin/php artisan view:cache
+
+            /opt/alt/php84/usr/bin/php artisan up
