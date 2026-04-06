@@ -43,6 +43,13 @@ return [
             'synchronous' => null,
         ],
 
+        'sqlite_pumper' => [
+            'driver' => 'sqlite',
+            'database' => database_path('database.sqlite'),
+            'prefix' => '',
+            'foreign_key_constraints' => false,
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
