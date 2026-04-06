@@ -40,30 +40,6 @@
                 </div>
             </div>
 
-            {{-- Email Row --}}
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 4rem; padding: 1.1rem 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.875rem; flex: 1;">
-                    <div style="
-                        width: 2.5rem; height: 2.5rem; border-radius: 0.5rem;
-                        background: #f0fdf4;
-                        display: flex; align-items: center; justify-content: center;
-                        flex-shrink: 0;
-                    ">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#22c55e" style="width: 1.2rem; height: 1.2rem;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                        </svg>
-                    </div>
-                    <div>
-                        <p style="font-size: 0.78rem; color: #9ca3af; margin-bottom: 0.15rem;">Email</p>
-                        <p style="font-size: 0.95rem; font-weight: 600;" class="text-gray-900 dark:text-white">
-                            {{ auth()->user()->email }}
-                        </p>
-                    </div>
-                </div>
-                <div style="flex-shrink: 0;">
-                    {{ ($this->editEmailAction)(['email' => auth()->user()->email]) }}
-                </div>
-            </div>
         </div>
 
         {{-- Card: Keamanan --}}
@@ -95,7 +71,7 @@
                     <div>
                         <p style="font-size: 0.78rem; color: #9ca3af; margin-bottom: 0.15rem;">Password</p>
                         <p style="font-size: 0.95rem; font-weight: 600; letter-spacing: 0.15em;" class="text-gray-900 dark:text-white">
-                            ••••••••
+                            ********
                         </p>
                     </div>
                 </div>

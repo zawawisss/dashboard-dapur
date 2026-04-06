@@ -17,7 +17,7 @@ class TransactionSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('username', 'admin')->first();
-        $investor = User::where('username', 'shifyannn')->first();
+        $investor = User::where('username', 'investor')->first();
         
         $categories = Category::all();
         $inCategories = $categories->where('type', 'IN');

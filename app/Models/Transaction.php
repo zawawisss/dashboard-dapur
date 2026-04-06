@@ -18,6 +18,7 @@ class Transaction extends Model
         'amount',
         'date',
         'note',
+        'receipt',
     ];
 
     protected function casts(): array
@@ -35,5 +36,13 @@ class Transaction extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the transaction type (IN/OUT) from its category.
+     */
+    public function getTypeAttribute(): ?string
+    {
+        return $this->category?->type;
     }
 }

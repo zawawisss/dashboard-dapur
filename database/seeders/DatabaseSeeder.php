@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,32 +14,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::firstOrCreate(
-            ['email' => 'admin@admin.com'],
+        $now = now();
+
+        DB::table('users')
+            ->whereNotIn('username', ['admin', 'investor'])
+            ->delete();
+
+        DB::table('users')->upsert([
             [
+                'email' => 'admin@admin.com',
                 'username' => 'admin',
-                'password' => bcrypt('password'),
+                'password' => Hash::make('password'),
                 'role' => 'ADMIN',
-            ]
-        );
-
-        \App\Models\User::firstOrCreate(
-            ['email' => 'asifyan@gmail.com'],
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
             [
-                'username' => 'shifyannn',
-                'password' => bcrypt('password'),
+                'email' => 'investor@investor.com',
+                'username' => 'investor',
+                'password' => Hash::make('password'),
                 'role' => 'USER',
-            ]
-        );
-
-        \App\Models\User::firstOrCreate(
-            ['email' => 'dev@gmail.com'],
-            [
-                'username' => 'dev',
-                'password' => bcrypt('devPassword'),
-                'role' => 'DEV',
-            ]
-        );
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ], ['email'], ['username', 'password', 'role', 'updated_at']);
 
         $this->call([
             CategorySeeder::class,

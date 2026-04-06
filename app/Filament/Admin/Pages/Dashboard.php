@@ -2,36 +2,42 @@
 
 namespace App\Filament\Admin\Pages;
 
-use Filament\Forms\Components\Select;
+use App\Filament\Admin\Resources\Categories\CategoryResource;
+use App\Filament\Admin\Widgets\BukuKasStats;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 
 class Dashboard extends \Filament\Pages\Dashboard
 {
-    use HasFiltersForm;
+    protected static ?string $title = 'Beranda Operasional';
+    protected static ?string $navigationLabel = 'Beranda';
 
-    public function filtersForm(Schema $schema): Schema
+    public function getColumns(): int | array
     {
-        $options = [
-            'all' => 'Semua Data',
-            'admin' => 'Data Pelaku Usaha',
-            'investors' => 'Data Semua Investor',
+        return [
+            'default' => 1,
+            'md' => 2,
         ];
+    }
 
-        // Tambahkan pilihan nama masing-masing investor (optimized pluck)
-        $investorOptions = \App\Models\User::where('role', 'USER')->pluck('username', 'id');
-        foreach ($investorOptions as $id => $username) {
-            $options['investor_' . $id] = 'Investor: ' . $username;
-        }
+    public function getWidgets(): array
+    {
+        return [
+            BukuKasStats::class,
+        ];
+    }
 
+    public function content(Schema $schema): Schema
+    {
         return $schema
             ->components([
-                Select::make('role_filter')
-                    ->label('Tampilan Data')
-                    ->options($options)
-                    ->default('all')
-                    // Hanya ditampilkan untuk admin
-                    ->visible(fn () => auth()->user()->isAdmin()),
+                View::make('filament.admin.pages.dashboard-overview')
+                    ->viewData([
+                        'cashBookUrl' => FinancialReport::getUrl(),
+                        'categoryUrl' => CategoryResource::canAccess() ? CategoryResource::getUrl() : null,
+                        'profileUrl' => Setting::getUrl(),
+                    ]),
+                $this->getWidgetsContentComponent(),
             ]);
     }
 }

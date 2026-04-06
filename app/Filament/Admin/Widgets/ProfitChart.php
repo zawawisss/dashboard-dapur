@@ -5,57 +5,53 @@ namespace App\Filament\Admin\Widgets;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Support\Facades\Schema;
 
 class ProfitChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
-
     protected ?string $heading = 'Tren Laba Bersih (1 Tahun Terakhir)';
     protected static ?int $sort = 4;
     protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {
-        $baseQuery = Transaction::query();
-        $user = auth()->user();
-
-        if ($user->isAdmin()) {
-            $currentFilter = $this->filters['role_filter'] ?? 'all';
-            if ($currentFilter === 'admin') {
-                $baseQuery->where('transactions.user_id', $user->id);
-            } elseif ($currentFilter === 'investors') {
-                $baseQuery->whereHas('user', function ($q) {
-                    $q->where('role', 'USER');
-                });
-            } elseif (str_starts_with($currentFilter, 'investor_')) {
-                $baseQuery->where('transactions.user_id', str_replace('investor_', '', $currentFilter));
-            }
-        } else {
-            $baseQuery->where('transactions.user_id', $user->id);
+        if (! Schema::hasTable('transactions') || ! Schema::hasTable('categories')) {
+            return [
+                'datasets' => [[
+                    'label' => 'Laba Bersih (Rp)',
+                    'data' => array_fill(0, 12, 0),
+                    'borderColor' => '#3b82f6',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.15)',
+                    'fill' => true,
+                ]],
+                'labels' => collect(range(11, 0))
+                    ->map(fn ($i) => Carbon::now()->subMonths($i)->translatedFormat('M Y'))
+                    ->all(),
+            ];
         }
 
         $startDate = Carbon::now()->subMonths(11)->startOfMonth();
         $endDate   = Carbon::now()->endOfMonth();
 
-        // Satu query per tipe, bukan 24 query terpisah (12 income + 12 expense)
-        $incomeResults = (clone $baseQuery)
-            ->join('categories', 'transactions.category_id', '=', 'categories.id')
-            ->where('categories.type', 'IN')
-            ->whereBetween('transactions.date', [$startDate, $endDate])
-            ->selectRaw('YEAR(transactions.date) as year, MONTH(transactions.date) as month, SUM(transactions.amount) as total')
-            ->groupByRaw('YEAR(transactions.date), MONTH(transactions.date)')
-            ->get()
-            ->keyBy(fn($r) => $r->year . '-' . $r->month);
+        $driver = \Illuminate\Support\Facades\DB::getDriverName();
+        $selectRaw = $driver === 'sqlite'
+            ? "strftime('%Y', transactions.date) as year, strftime('%m', transactions.date) as month, SUM(transactions.amount) as total"
+            : "YEAR(transactions.date) as year, MONTH(transactions.date) as month, SUM(transactions.amount) as total";
+        $groupByRaw = $driver === 'sqlite'
+            ? "strftime('%Y', transactions.date), strftime('%m', transactions.date)"
+            : "YEAR(transactions.date), MONTH(transactions.date)";
 
-        $expenseResults = (clone $baseQuery)
+        $base = Transaction::query()
             ->join('categories', 'transactions.category_id', '=', 'categories.id')
-            ->where('categories.type', 'OUT')
             ->whereBetween('transactions.date', [$startDate, $endDate])
-            ->selectRaw('YEAR(transactions.date) as year, MONTH(transactions.date) as month, SUM(transactions.amount) as total')
-            ->groupByRaw('YEAR(transactions.date), MONTH(transactions.date)')
-            ->get()
-            ->keyBy(fn($r) => $r->year . '-' . $r->month);
+            ->selectRaw($selectRaw)
+            ->groupByRaw($groupByRaw);
+
+        $incomeResults = (clone $base)->where('categories.type', 'IN')->get()
+            ->keyBy(fn($r) => $r->year . '-' . (int)$r->month);
+
+        $expenseResults = (clone $base)->where('categories.type', 'OUT')->get()
+            ->keyBy(fn($r) => $r->year . '-' . (int)$r->month);
 
         $data   = [];
         $labels = [];
@@ -70,15 +66,13 @@ class ProfitChart extends ChartWidget
         }
 
         return [
-            'datasets' => [
-                [
-                    'label'           => 'Total Laba Bersih (Rp)',
-                    'data'            => $data,
-                    'borderColor'     => '#3b82f6',
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
-                    'fill'            => true,
-                ],
-            ],
+            'datasets' => [[
+                'label'           => 'Laba Bersih (Rp)',
+                'data'            => $data,
+                'borderColor'     => '#3b82f6',
+                'backgroundColor' => 'rgba(59, 130, 246, 0.15)',
+                'fill'            => true,
+            ]],
             'labels' => $labels,
         ];
     }

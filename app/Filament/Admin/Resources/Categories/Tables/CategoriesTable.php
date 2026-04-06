@@ -21,7 +21,7 @@ class CategoriesTable
                     ->label('Tipe')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'IN' => 'Pendapatan',
+                        'IN' => 'Pemasukan',
                         'OUT' => 'Pengeluaran',
                         default => $state,
                     })
@@ -40,12 +40,18 @@ class CategoriesTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
-                \Filament\Actions\DeleteAction::make(),
+                EditAction::make()
+                    ->label('Ubah Kategori'),
+                \Filament\Actions\DeleteAction::make()
+                    ->label('Hapus Kategori')
+                    ->modalHeading('Hapus Kategori')
+                    ->modalDescription('Kategori yang dihapus tidak bisa dipakai lagi pada transaksi baru.')
+                    ->modalSubmitActionLabel('Ya, Hapus'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->label('Hapus Kategori Terpilih'),
                 ]),
             ]);
     }

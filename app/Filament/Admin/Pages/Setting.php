@@ -42,32 +42,7 @@ class Setting extends Page
             ])
             ->action(function (array $data): void {
                 auth()->user()->update(['username' => $data['username']]);
-                Notification::make()->title('Username berhasil diperbarui!')->success()->send();
-            });
-    }
-
-    /**
-     * Action: ubah email
-     */
-    public function editEmailAction(): Action
-    {
-        return Action::make('editEmail')
-            ->label('Ubah')
-            ->icon('heroicon-o-pencil-square')
-            ->color('primary')
-            ->modalHeading('Ubah Email')
-            ->modalSubmitActionLabel('Simpan')
-            ->schema([
-                TextInput::make('email')
-                    ->label('Email Baru')
-                    ->email()
-                    ->default(fn () => auth()->user()->email)
-                    ->required()
-                    ->unique('users', 'email', ignorable: auth()->user()),
-            ])
-            ->action(function (array $data): void {
-                auth()->user()->update(['email' => $data['email']]);
-                Notification::make()->title('Email berhasil diperbarui!')->success()->send();
+                Notification::make()->title('Username berhasil diperbarui.')->success()->send();
             });
     }
 
@@ -104,7 +79,7 @@ class Setting extends Page
             ])
             ->action(function (array $data): void {
                 auth()->user()->update(['password' => Hash::make($data['new_password'])]);
-                Notification::make()->title('Password berhasil diperbarui!')->success()->send();
+                Notification::make()->title('Password berhasil diperbarui.')->success()->send();
             });
     }
 }

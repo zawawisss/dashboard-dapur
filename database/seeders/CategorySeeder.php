@@ -14,7 +14,7 @@ class CategorySeeder extends Seeder
     {
         $categories = [
             // Pemasukan (IN)
-            ['name' => 'Pendapatan', 'type' => 'IN'],
+            ['name' => 'Pemasukan', 'type' => 'IN'],
             ['name' => 'Modal Awal', 'type' => 'IN'],
             ['name' => 'Lain-lain (IN)', 'type' => 'IN'],
             

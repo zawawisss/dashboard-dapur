@@ -18,7 +18,7 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     public static function getNavigationSort(): ?int
     {
@@ -32,7 +32,12 @@ class CategoryResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'Manajemen Kategori';
+        return 'Kategori Transaksi';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'PENGATURAN SISTEM';
     }
 
     public static function canAccess(): bool

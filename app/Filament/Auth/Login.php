@@ -3,7 +3,7 @@
 namespace App\Filament\Auth;
 
 use Filament\Auth\Pages\Login as BaseLogin;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
@@ -30,12 +30,16 @@ class Login extends BaseLogin
      */
     protected function getUsernameFormComponent(): Component
     {
-        return TextInput::make('username')
+        return ToggleButtons::make('username')
             ->label(__('Username'))
+            ->options([
+                'admin' => 'admin',
+                'investor' => 'investor',
+            ])
             ->required()
-            ->autocomplete()
             ->autofocus()
-            ->extraInputAttributes(['name' => 'username']);
+            ->inline()
+            ->default('admin');
     }
 
     /**

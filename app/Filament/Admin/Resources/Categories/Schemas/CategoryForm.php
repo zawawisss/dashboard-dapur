@@ -18,7 +18,7 @@ class CategoryForm
                 Select::make('type')
                     ->label('Tipe')
                     ->options([
-                        'IN' => 'Pendapatan (IN)',
+                        'IN' => 'Pemasukan (IN)',
                         'OUT' => 'Pengeluaran (OUT)',
                     ])
                     ->required(),

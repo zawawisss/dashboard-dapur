@@ -22,7 +22,7 @@ class ListCategories extends ListRecords
     {
         return [
             'all' => \Filament\Schemas\Components\Tabs\Tab::make('Semua'),
-            'income' => \Filament\Schemas\Components\Tabs\Tab::make('Pendapatan')
+            'income' => \Filament\Schemas\Components\Tabs\Tab::make('Pemasukan')
                 ->modifyQueryUsing(fn (\Illuminate\Database\Eloquent\Builder $query) => $query->where('type', 'IN')),
             'expense' => \Filament\Schemas\Components\Tabs\Tab::make('Pengeluaran')
                 ->modifyQueryUsing(fn (\Illuminate\Database\Eloquent\Builder $query) => $query->where('type', 'OUT')),
